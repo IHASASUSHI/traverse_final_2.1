@@ -110,8 +110,25 @@ void Bobbin_Setting() {
     u.b[1] = val[4];
     u.b[2] = val[3];
     u.b[3] = val[2];
+    bobbin_dia = u.ival;
+  }
+  if (val[1] == 3) {
+    u.b[0] = val[5];
+    u.b[1] = val[4];
+    u.b[2] = val[3];
+    u.b[3] = val[2];
     bobbin_length = u.ival;
   }
+}
+
+void Start_Winding() {
+    traverse.moveTo(goal[1]);
+    traverse.setMaxSpeed(traverse_speed);
+    traverse.setSpeed(traverse_speed);
+    winder.move(Winder_goal);
+    winder.setMaxSpeed(winder_speed);
+    winder.setSpeed(winder_speed);
+    Start_spinning = true;
 }
 
 

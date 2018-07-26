@@ -28,15 +28,13 @@ int Ammount = 614;
 float bobbin_length = 4.3; // inches
 float bobbin_dia = 0.618; // inches
 float pully_dia = 0.625; // inches
-float traverse_dist_per_rev = pully_dia * PI; // 0.625*pi
+int ticks_per_rev = 3200;
 float bobbin_dist_per_rev = bobbin_dia * PI;
-int ticks_per_revolution = 3200;
-int traverse_dist_per_tick = traverse_dist_per_revolution / ticks_per_rev;
-float traverse_ticks = bobbin_length / traverse_dist_per_tick;
-float goal[] = {0, flipper * traverse_ticks}; // to go from 0 to trav ticks
+float goal[] = {0, flipper * bobbin_length / (pully_dia * PI / ticks_per_rev)}; // to go from 0 to trav ticks
 float Winder_goal = Ammount / (bobbin_dist_per_rev / ticks_per_rev);
 volatile uint8_t idx = 0;
 boolean test = false;
+boolean Start_spinning = false;
 boolean Auto_Calibrate = false;
 int Yarn_Ammount = 0;
 int Ticks_Per_mm = 67;
@@ -96,6 +94,9 @@ void loop() {
     else if (val[0] == 3) {
       Bobbin_Setting();
     }
+    else if (val[0] == 4) {
+      Start_Winding();
+    }
     for (int i = 0 ; i < sizeof(val) ; i++) {
       Serial.print(val[i]);
     }
@@ -103,15 +104,16 @@ void loop() {
   }
   else {
     Serial.println("0");
-    delay(0); //I dont know why but accelstepper freaks out without some kind of delay
+    delay(10); //I dont know why but accelstepper freaks out without some kind of delay
   }
 
   // put your main code here, to run repeatedly:
   noInterrupts(); // disables interrupts
-  traverseposition = traverse.currentPosition();
-  winderposition = winder.currentPosition();
   if (test) {
     Test_Run();
+  }
+  if (Start_spinning) {
+    Run();
   }
   if (Auto_Calibrate) {
     traverse.move(flipper * -100);
